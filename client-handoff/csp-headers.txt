@@ -1,0 +1,31 @@
+Content Security Policy Headers for Ritzie Chat Widget
+
+Add these CSP directives to your website if you have strict security policies:
+
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' https://assets.clientdomain.com;
+  style-src 'self' 'unsafe-inline' https://assets.clientdomain.com;
+  connect-src 'self' https://api.ritzie.ai https://telemetry.clientdomain.com wss://api.ritzie.ai;
+  img-src 'self' data: https:;
+
+# Alternative: Using default CDN
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' https://cdn.ritzie.ai;
+  style-src 'self' 'unsafe-inline' https://cdn.ritzie.ai;
+  connect-src 'self' https://api.ritzie.ai https://events.ritzie.ai wss://api.ritzie.ai;
+  img-src 'self' data: https:;
+
+# Notes:
+# - Add 'wss://api.ritzie.ai' for WebSocket connections
+# - 'unsafe-inline' required for Shadow DOM styles
+# - Replace CLIENT.com with actual client domain
+# - Test thoroughly after implementing CSP
+
+Replace "clientdomain.com" with your actual domain if using vanity CDN.
+
+For internal CDN (no vanity), use:
+  script-src 'self' https://cdn.ritzie.ai;
+  style-src 'self' 'unsafe-inline' https://cdn.ritzie.ai;
+  connect-src 'self' https://api.ritzie.ai https://events.ritzie.ai;

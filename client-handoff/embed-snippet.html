@@ -1,0 +1,44 @@
+<!-- Ritzie Chat Widget - Production Embed Snippet -->
+<!-- Paste this code in your website's <head> or before </body> -->
+
+<!-- Option 1: Bubble Widget (Recommended) -->
+<script>
+  window.RITZIE = {
+    siteToken: "SITE_live",
+    botId: "BOT_live",
+    mode: "bubble",
+    assetsBase: "https://assets.clientdomain.com"  // or https://cdn.ritzie.ai
+  };
+</script>
+<script src="https://assets.clientdomain.com/embeds/chat.v1.js" async></script>
+
+<!-- Option 2: Full-Page Chat -->
+<!-- Add this div where you want the chat to appear -->
+<div id="ritzie-chat" style="height:100vh;"></div>
+<script>
+  window.RITZIE = {
+    siteToken: "SITE_live",
+    botId: "BOT_live",
+    mode: "page",
+    mount: "#ritzie-chat",
+    assetsBase: "https://assets.clientdomain.com"
+  };
+</script>
+<script src="https://assets.clientdomain.com/embeds/chat.v1.js" async></script>
+
+<!-- Runtime Control (Optional) -->
+<script>
+// Switch modes dynamically
+window.RITZIE?.api?.setMode("bubble");   // Bubble widget
+window.RITZIE?.api?.setMode("page");     // Full-page chat
+window.RITZIE?.api?.setMode("disabled"); // Hide completely
+
+// Manual open/close (bubble mode only)
+window.RITZIE?.api?.open();
+window.RITZIE?.api?.close();
+</script>
+
+<!-- 
+Alternative for internal CDN (no vanity domain):
+<script src="https://cdn.ritzie.ai/embeds/chat.v1.js" async></script>
+-->
