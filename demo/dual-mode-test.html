@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritzie Dual Mode Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .mode-controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .mode-controls button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .mode-controls button:hover {
+            background: #e9ecef;
+        }
+        .chat-container {
+            height: 500px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .chat-container::before {
+            content: "Full-page chat will appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-style: italic;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ritzie Dual Mode Test</h1>
+        
+        <div class="info">
+            <strong>Current Mode:</strong> <span id="current-mode">bubble</span>
+        </div>
+        
+        <div class="mode-controls">
+            <h3>Mode Controls:</h3>
+            <button onclick="setMode('bubble')">Bubble Mode</button>
+            <button onclick="setMode('page')">Full-Page Mode</button>
+            <button onclick="setMode('disabled')">Disabled</button>
+            <button onclick="openChat()">Open Chat</button>
+            <button onclick="closeChat()">Close Chat</button>
+        </div>
+        
+        <div class="info">
+            <strong>Instructions:</strong>
+            <ul>
+                <li><strong>Bubble Mode:</strong> Chat button appears in bottom-right corner</li>
+                <li><strong>Full-Page Mode:</strong> Chat interface fills the container below</li>
+                <li><strong>Disabled:</strong> Widget is completely hidden</li>
+                <li>Use the buttons above to test mode switching</li>
+            </ul>
+        </div>
+        
+        <div id="ritzie-chat" class="chat-container"></div>
+        
+        <div class="info">
+            <strong>Test Checklist:</strong>
+            <ul>
+                <li>✓ Bubble mode shows floating button</li>
+                <li>✓ Page mode fills container above</li>
+                <li>✓ Mode switching works without page reload</li>
+                <li>✓ Chat responses work in both modes</li>
+                <li>✓ Disabled mode hides widget completely</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        window.RITZIE = {
+            siteToken: "SITE_demo_site1",
+            botId: "550e8400-e29b-41d4-a716-446655440003",
+            theme: "palantr",
+            mode: "bubble",
+            mount: "#ritzie-chat",
+            assetsBase: "http://localhost:8080",
+            telemetryBase: "http://localhost:8080",
+            themeOverrides: {
+                brand: {
+                    accent: "#3B82F6"
+                }
+            }
+        };
+
+        function setMode(mode) {
+            if (window.RITZIE?.api?.setMode) {
+                window.RITZIE.api.setMode(mode);
+                document.getElementById('current-mode').textContent = mode;
+            } else {
+                alert('Widget not loaded yet. Please wait and try again.');
+            }
+        }
+
+        function openChat() {
+            if (window.RITZIE?.api?.open) {
+                window.RITZIE.api.open();
+            }
+        }
+
+        function closeChat() {
+            if (window.RITZIE?.api?.close) {
+                window.RITZIE.api.close();
+            }
+        }
+
+        // Update current mode display
+        setInterval(() => {
+            if (window.RITZIE?.mode) {
+                document.getElementById('current-mode').textContent = window.RITZIE.mode;
+            }
+        }, 1000);
+    </script>
+    <script src="http://localhost:8080/embeds/chat.v1.js" async></script>
+</body>
+</html>

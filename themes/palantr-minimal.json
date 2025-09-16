@@ -1,0 +1,83 @@
+{
+  "id": "palantr-min",
+  "name": "Palantr Minimal",
+  "brand": {
+    "logoUrl": "",
+    "avatarUrl": "",
+    "accent": "#3B82F6"
+  },
+  "colors": {
+    "light": {
+      "bg": "#FFFFFF",
+      "panel": "#FFFFFF",
+      "text": "#0B1220",
+      "muted": "#6B7280",
+      "divider": "rgba(0,0,0,.06)",
+      "chip": "#F3F4F6",
+      "input": "#F9FAFB"
+    },
+    "dark": {
+      "bg": "#0B0F14",
+      "panel": "#0E131A",
+      "text": "#E6EAF0",
+      "muted": "#9AA3AF",
+      "divider": "rgba(255,255,255,.08)",
+      "chip": "#0F141B",
+      "input": "#11161E"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+    "baseSize": 14,
+    "lineHeight": 1.45
+  },
+  "radius": {
+    "sm": 10,
+    "md": 14,
+    "lg": 16,
+    "pill": 999
+  },
+  "space": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24
+  },
+  "shadow": {
+    "elevation": "0 10px 30px rgba(0,0,0,.18)"
+  },
+  "layout": {
+    "mode": "bubble",
+    "bubbleWidth": 440,
+    "bubbleMaxHeightVh": 90,
+    "pageHeader": true,
+    "mountSelector": "#ritzie-chat"
+  },
+  "motion": {
+    "curvePrimary": "cubic-bezier(.2,.8,.2,1)",
+    "durations": {
+      "micro": 120,
+      "content": 180,
+      "macro": 220,
+      "stagger": 40
+    },
+    "reducedMotion": true
+  },
+  "components": {
+    "message": {
+      "userBg": "accent",
+      "botBg": "chip"
+    },
+    "chip": {
+      "bordered": true
+    },
+    "button": {
+      "style": "subtle"
+    }
+  },
+  "personality": {
+    "tone": "calm_pro",
+    "emoji": false
+  }
+}

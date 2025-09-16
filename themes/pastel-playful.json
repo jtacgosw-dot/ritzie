@@ -1,0 +1,83 @@
+{
+  "id": "pastel-play",
+  "name": "Pastel Playful",
+  "brand": {
+    "logoUrl": "",
+    "avatarUrl": "",
+    "accent": "#A855F7"
+  },
+  "colors": {
+    "light": {
+      "bg": "#FEFEFE",
+      "panel": "#FFFFFF",
+      "text": "#1F2937",
+      "muted": "#6B7280",
+      "divider": "rgba(139,92,246,.12)",
+      "chip": "#F3E8FF",
+      "input": "#FAFAFA"
+    },
+    "dark": {
+      "bg": "#0F0A1A",
+      "panel": "#1A1625",
+      "text": "#F3E8FF",
+      "muted": "#A78BFA",
+      "divider": "rgba(139,92,246,.2)",
+      "chip": "#2D1B69",
+      "input": "#1E1B3A"
+    }
+  },
+  "typography": {
+    "fontFamily": "Poppins, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+    "baseSize": 15,
+    "lineHeight": 1.5
+  },
+  "radius": {
+    "sm": 12,
+    "md": 18,
+    "lg": 24,
+    "pill": 999
+  },
+  "space": {
+    "xs": 6,
+    "sm": 10,
+    "md": 14,
+    "lg": 18,
+    "xl": 28
+  },
+  "shadow": {
+    "elevation": "0 8px 25px rgba(139,92,246,.15)"
+  },
+  "layout": {
+    "mode": "bubble",
+    "bubbleWidth": 420,
+    "bubbleMaxHeightVh": 85,
+    "pageHeader": true,
+    "mountSelector": "#ritzie-chat"
+  },
+  "motion": {
+    "curvePrimary": "cubic-bezier(.34,1.56,.64,1)",
+    "durations": {
+      "micro": 140,
+      "content": 200,
+      "macro": 280,
+      "stagger": 60
+    },
+    "reducedMotion": true
+  },
+  "components": {
+    "message": {
+      "userBg": "accent",
+      "botBg": "chip"
+    },
+    "chip": {
+      "bordered": false
+    },
+    "button": {
+      "style": "playful"
+    }
+  },
+  "personality": {
+    "tone": "playful_light",
+    "emoji": true
+  }
+}
