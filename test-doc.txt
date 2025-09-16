@@ -1,0 +1,8 @@
+Demo Corp Knowledge Base
+
+Business Hours: Monday through Friday, 9 AM to 6 PM EST
+Support: 24/7 emergency support for enterprise clients
+Pricing: Starting at $99/month for basic plans
+Contact: sales@democorp.com for custom pricing
+
+This is test content for ingestion pipeline verification.
