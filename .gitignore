@@ -10,3 +10,9 @@ build/
 .idea/
 coverage/
 *.tsbuildinfo
+.env
+.env.*
+*.env
+*.pem
+*.key
+config.local.*
