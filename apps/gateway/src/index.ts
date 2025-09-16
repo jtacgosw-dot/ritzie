@@ -47,4 +47,21 @@ const server = app.listen(process.env.PORT || 8080, () => {
 
 attachWS(server);
 
+if (process.env.NODE_ENV === 'production') {
+  import('./jobs/faq-aggregation.js').then(({ runFaqAggregation }) => {
+    import('./jobs/ingestion.js').then(({ scheduleAnalyticsRollups, ingestQueue }) => {
+      ingestQueue.add('faq-aggregation', {}, {
+        repeat: { pattern: '0 2 * * *' },
+        removeOnComplete: 10,
+        removeOnFail: 5,
+        jobId: 'faq-aggregation-daily'
+      });
+      
+      scheduleAnalyticsRollups();
+      
+      console.log('✅ Production jobs scheduled');
+    });
+  });
+}
+
 export default app;
