@@ -32,7 +32,11 @@ app.use("/embeds", express.static(embedPath));
 app.use("/themes", express.static(path.resolve(process.cwd(), "public/themes")));
 
 app.use("/v1/analytics", analyticsRoutes);
-app.use("/v1/embed", embedConfigRoutes);
+app.use("/v1/embed-config", embedConfigRoutes);
+
+import adminRoutes from "./routes/admin.js";
+app.use("/v1/admin", adminRoutes);
+app.use("/admin", express.static(path.resolve(process.cwd(), "public/admin")));
 app.post("/v1/chat/stream", requireSite, rateLimitMiddleware, noCompression, sseChat);
 
 const server = app.listen(process.env.PORT || 8080, () => {

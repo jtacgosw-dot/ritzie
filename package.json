@@ -9,14 +9,24 @@
   "scripts": {
     "dev:gateway": "pnpm -F @ritzie/gateway dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test --grep=\"accessibility\"",
+    "build:embed": "pnpm -F @ritzie/embed build"
   },
   "devDependencies": {
     "@types/compression": "^1.8.1",
     "@types/ws": "^8.5.10",
     "nodemon": "^3.0.0",
     "ts-node": "^10.9.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@playwright/test": "^1.40.0",
+    "@axe-core/playwright": "^4.8.2",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0"
   },
   "engines": {
     "node": ">=20.0.0",
