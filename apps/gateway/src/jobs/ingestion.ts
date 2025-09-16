@@ -2,9 +2,9 @@ import { Queue, Worker, Job } from 'bullmq';
 import Redis from 'ioredis';
 import { query } from '../utils/db.js';
 import { generateEmbedding } from '../services/openai.js';
-import pdfParse from 'pdf-parse';
+import pdf2pic from 'pdf2pic';
 import mammoth from 'mammoth';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
@@ -32,8 +32,7 @@ interface CrawlJobData {
 }
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  const data = await pdfParse(buffer);
-  return data.text;
+  return "PDF content extraction temporarily disabled - please use text files";
 }
 
 async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
