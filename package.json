@@ -1,0 +1,30 @@
+{
+  "name": "ritzie",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:gateway": "pnpm -F @ritzie/gateway dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/ws": "^8.5.10",
+    "nodemon": "^3.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "openai": "^4.104.0",
+    "ws": "^8.18.3"
+  }
+}
