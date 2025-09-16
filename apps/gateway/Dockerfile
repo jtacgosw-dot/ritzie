@@ -22,6 +22,7 @@ RUN pnpm install
 # Copy source code for all packages
 COPY packages/ ./packages/
 COPY apps/gateway/ ./apps/gateway/
+COPY themes/ ./themes/
 
 # Build the gateway application
 WORKDIR /app/apps/gateway

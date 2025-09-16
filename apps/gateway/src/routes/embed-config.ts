@@ -108,8 +108,12 @@ function deepMerge(target: any, source: any): any {
 function loadThemePreset(themeId: string): ThemeConfig | null {
   try {
     const themePath = path.join(process.cwd(), '../../themes', `${themeId}.json`);
+    console.log(`Attempting to load theme from: ${themePath}`);
+    console.log(`File exists: ${fs.existsSync(themePath)}`);
+    
     if (fs.existsSync(themePath)) {
       const themeData = JSON.parse(fs.readFileSync(themePath, 'utf8'));
+      console.log(`Successfully parsed theme data for ${themeId}`);
       return themeData;
     }
   } catch (error) {
@@ -135,12 +139,20 @@ router.get('/', requireSite, async (req: any, res) => {
 
     let effectiveTheme = BASE_THEME;
     
-    const themeId = bot.theme?.id || bot.theme || 'palantr';
-    if (typeof themeId === 'string') {
-      const preset = loadThemePreset(themeId);
-      if (preset) {
-        effectiveTheme = deepMerge(effectiveTheme, preset);
-      }
+    let themeId = 'base';
+    if (bot.theme && typeof bot.theme === 'object' && bot.theme.id) {
+      themeId = bot.theme.id;
+    } else if (typeof bot.theme === 'string') {
+      themeId = bot.theme;
+    }
+    
+    console.log(`Loading theme preset for themeId: ${themeId}`);
+    const preset = loadThemePreset(themeId);
+    if (preset) {
+      console.log(`Successfully loaded theme preset: ${preset.name}`);
+      effectiveTheme = deepMerge(effectiveTheme, preset);
+    } else {
+      console.warn(`Failed to load theme preset: ${themeId}`);
     }
     
     if (bot.theme && typeof bot.theme === 'object') {

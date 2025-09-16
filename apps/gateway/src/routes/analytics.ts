@@ -1,31 +1,29 @@
 import { Router, Request, Response } from 'express';
-import { ingestAnalyticsEvents } from '../services/analytics.js';
-import { extractSiteFromToken } from '../utils/auth.js';
 import { query } from '../utils/db.js';
+import { requireSite } from '../auth.js';
 
 const router: any = Router();
 
-router.post('/events', async (req: Request, res: Response) => {
+router.post('/events', requireSite, async (req: any, res: Response) => {
   try {
-    const { org_id, site_id, bot_id, visitor_id, events } = req.body;
+    const { events } = req.body;
+    const { org_id, site_id, bot_id } = req.site;
+    const visitor_id = req.body.visitor_id || 'anonymous';
     
-    if (!org_id || !site_id || !bot_id || !visitor_id || !events || !Array.isArray(events)) {
-      return res.status(400).json({ error: 'Missing required fields or invalid events array' });
+    if (!events || !Array.isArray(events)) {
+      return res.status(400).json({ error: 'Missing events array' });
     }
 
     for (const event of events) {
       if (!event.type) {
         return res.status(400).json({ error: 'Each event must have a type' });
       }
+      
+      await query(
+        'INSERT INTO events (org_id, site_id, bot_id, visitor_id, type, payload, ts) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+        [org_id, site_id, bot_id, visitor_id, event.type, JSON.stringify(event.payload || {}), new Date()]
+      );
     }
-
-    await ingestAnalyticsEvents({
-      org_id,
-      site_id,
-      bot_id,
-      visitor_id,
-      events
-    });
 
     res.json({ ok: true, ingested: events.length });
 
@@ -35,9 +33,10 @@ router.post('/events', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/faqs', async (req: Request, res: Response) => {
+router.get('/top-faqs', requireSite, async (req: any, res: Response) => {
   try {
-    const { site_id, from, to, k = 50, clustered = true } = req.query;
+    const { from, to, k = 50, clustered = true } = req.query;
+    const { site_id } = req.site;
     
     if (!site_id) {
       return res.status(400).json({ error: 'missing_site_id' });
@@ -207,9 +206,10 @@ router.get('/faqs', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/kpi', async (req: Request, res: Response) => {
+router.get('/kpi', requireSite, async (req: any, res: Response) => {
   try {
-    const { site_id, from, to } = req.query;
+    const { from, to } = req.query;
+    const { site_id } = req.site;
     
     if (!site_id) {
       return res.status(400).json({ error: 'missing_site_id' });

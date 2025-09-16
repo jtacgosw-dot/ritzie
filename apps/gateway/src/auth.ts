@@ -34,6 +34,14 @@ export function requireSite(req: Request, res: Response, next: NextFunction) {
       "SITE_live": { 
         site_id: "550e8400-e29b-41d4-a716-446655440013", 
         org_id: "550e8400-e29b-41d4-a716-446655440002" 
+      },
+      "SITE_live_a": { 
+        site_id: "550e8400-e29b-41d4-a716-446655440301", 
+        org_id: "550e8400-e29b-41d4-a716-446655440201" 
+      },
+      "SITE_live_b": { 
+        site_id: "550e8400-e29b-41d4-a716-446655440302", 
+        org_id: "550e8400-e29b-41d4-a716-446655440202" 
       }
     };
     

@@ -17,8 +17,8 @@ class ChatWidget {
 
   constructor(config: RitzieConfig) {
     this.config = {
-      assetsBase: 'https://cdn.ritzie.ai',
-      telemetryBase: 'https://events.ritzie.ai',
+      assetsBase: 'https://cdn.example.com',
+      telemetryBase: 'https://events.example.com',
       ...config
     };
     
@@ -49,7 +49,7 @@ class ChatWidget {
     this.container.id = 'chat-widget';
     
     if (this.mode === 'page') {
-      const mountSelector = (this.config as any).mount || '#ritzie-chat';
+      const mountSelector = (this.config as any).mount || '#chat-widget';
       const mountElement = document.querySelector(mountSelector);
       if (mountElement) {
         this.container = mountElement as HTMLElement;
@@ -244,7 +244,7 @@ class ChatWidget {
   private connectWebSocket() {
     if (this.ws) return;
 
-    const apiBase = this.config.assetsBase?.replace('/embeds', '').replace('cdn.', 'api.') || 'https://api.ritzie.ai';
+    const apiBase = this.config.assetsBase?.replace('/embeds', '').replace('cdn.', 'api.') || 'https://api.example.com';
     const wsUrl = `${apiBase.replace('https://', 'wss://').replace('http://', 'ws://')}/v1/chat/ws?site_token=${this.config.siteToken}&bot_id=${this.config.botId}&visitor_id=${this.visitorId}`;
     
     this.ws = new WebSocket(wsUrl);
@@ -367,7 +367,7 @@ class ChatWidget {
     this.eventQueue = [];
 
     try {
-      const apiBase = this.config.assetsBase?.replace('/embeds', '').replace('cdn.', 'api.') || 'https://api.ritzie.ai';
+      const apiBase = this.config.assetsBase?.replace('/embeds', '').replace('cdn.', 'api.') || 'https://api.example.com';
       await fetch(`${apiBase}/v1/analytics/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -385,8 +385,8 @@ class ChatWidget {
   }
 
   private setupAPI() {
-    if (window.RITZIE) {
-      (window.RITZIE as any).api = {
+    if ((window as any).CHATBOT) {
+      ((window as any).CHATBOT as any).api = {
         setMode: (mode: 'bubble' | 'page' | 'disabled') => {
           this.setMode(mode);
         },
@@ -409,7 +409,7 @@ class ChatWidget {
       };
       console.log('Chat widget API initialized');
     } else {
-      console.warn('window.RITZIE not found during API setup');
+      console.warn('window.CHATBOT not found during API setup');
     }
   }
 
@@ -584,8 +584,8 @@ class ChatWidget {
 }
 
 (function() {
-  if (typeof window !== 'undefined' && window.RITZIE) {
-    new ChatWidget(window.RITZIE);
+  if (typeof window !== 'undefined' && (window as any).CHATBOT) {
+    new ChatWidget((window as any).CHATBOT);
   }
 })();
 
