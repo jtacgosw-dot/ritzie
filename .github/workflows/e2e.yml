@@ -1,0 +1,92 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ritzie_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    
+    - name: Install Playwright
+      run: pnpm exec playwright install --with-deps chromium
+    
+    - name: Setup database
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d ritzie_test -f infra/db/schema.sql
+        PGPASSWORD=postgres psql -h localhost -U postgres -d ritzie_test -f scripts/setup-demo-data.sql
+      env:
+        PGPASSWORD: postgres
+    
+    - name: Build application
+      run: |
+        pnpm run build
+        pnpm run build:embed
+    
+    - name: Start application
+      run: |
+        cd apps/gateway
+        pnpm start &
+        sleep 10
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/ritzie_test
+        REDIS_URL: redis://localhost:6379
+        JWT_SECRET: test_secret
+        OPENAI_API_KEY: sk-test
+        PORT: 8080
+    
+    - name: Run E2E tests
+      run: pnpm run test:e2e
+    
+    - name: Run accessibility tests
+      run: pnpm run test:a11y
+    
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

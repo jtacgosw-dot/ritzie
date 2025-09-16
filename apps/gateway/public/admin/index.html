@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritzie Admin - Theme Editor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 400px;
+            gap: 20px;
+        }
+        .sidebar, .preview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .bot-list {
+            list-style: none;
+        }
+        .bot-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .bot-item:hover {
+            background: #f8f9fa;
+        }
+        .bot-item.active {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 120px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+        .color-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .color-input input[type="color"] {
+            width: 40px;
+            height: 32px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #2196f3;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1976d2;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .json-editor {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .preview-frame {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .section:last-child {
+            border-bottom: none;
+        }
+        .section h3 {
+            margin-bottom: 12px;
+            color: #555;
+        }
+        .ab-test {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .history-item {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ritzie Admin - Theme Editor</h1>
+            <p>Manage bot themes, A/B tests, and appearance settings</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Bots</h2>
+                <div id="loading" class="loading">Loading bots...</div>
+                <ul id="bot-list" class="bot-list" style="display: none;"></ul>
+            </div>
+            
+            <div class="editor">
+                <div id="no-selection" style="text-align: center; padding: 40px; color: #666;">
+                    Select a bot to edit its theme
+                </div>
+                
+                <div id="theme-editor" style="display: none;">
+                    <div id="messages"></div>
+                    
+                    <div class="section">
+                        <h3>Theme Information</h3>
+                        <div class="form-group">
+                            <label>Theme Version</label>
+                            <input type="text" id="theme-version" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Layout Mode</label>
+                            <select id="layout-mode">
+                                <option value="bubble">Bubble</option>
+                                <option value="page">Full Page</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>Brand Settings</h3>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="color-input">
+                                <input type="color" id="accent-color">
+                                <input type="text" id="accent-color-text" placeholder="#3B82F6">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo URL</label>
+                            <input type="url" id="logo-url" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Avatar URL</label>
+                            <input type="url" id="avatar-url" placeholder="https://...">
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>Typography</h3>
+                        <div class="form-group">
+                            <label>Font Family</label>
+                            <input type="text" id="font-family" placeholder="Inter, system-ui, sans-serif">
+                        </div>
+                        <div class="form-group">
+                            <label>Base Font Size</label>
+                            <input type="number" id="font-size" min="12" max="18" step="1">
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>Colors</h3>
+                        <h4>Light Mode</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label>Background</label>
+                                <div class="color-input">
+                                    <input type="color" id="light-bg">
+                                    <input type="text" id="light-bg-text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Text</label>
+                                <div class="color-input">
+                                    <input type="color" id="light-text">
+                                    <input type="text" id="light-text-text">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4>Dark Mode</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label>Background</label>
+                                <div class="color-input">
+                                    <input type="color" id="dark-bg">
+                                    <input type="text" id="dark-bg-text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Text</label>
+                                <div class="color-input">
+                                    <input type="color" id="dark-text">
+                                    <input type="text" id="dark-text-text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>Advanced JSON Editor</h3>
+                        <div class="form-group">
+                            <label>Theme JSON</label>
+                            <textarea id="theme-json" placeholder="Edit theme JSON directly..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>A/B Testing</h3>
+                        <div class="ab-test">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="ab-enabled"> Enable A/B Testing
+                                </label>
+                            </div>
+                            <div id="ab-variants" style="display: none;">
+                                <div class="form-group">
+                                    <label>Variant A Theme</label>
+                                    <select id="variant-a"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Variant B Theme</label>
+                                    <select id="variant-b"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="saveTheme()">Save & Publish</button>
+                        <button class="btn btn-secondary" onclick="exportTheme()">Export JSON</button>
+                        <button class="btn btn-secondary" onclick="importTheme()">Import JSON</button>
+                        <button class="btn btn-secondary" onclick="duplicateTheme()">Duplicate</button>
+                        <button class="btn btn-danger" onclick="resetToPreset()">Reset to Preset</button>
+                    </div>
+                    
+                    <div class="section">
+                        <h3>Version History</h3>
+                        <div id="theme-history"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview">
+                <h3>Live Preview</h3>
+                <iframe id="preview-frame" class="preview-frame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+    
+    <script>
+        let currentBot = null;
+        let currentTheme = null;
+        
+        const STAFF_TOKEN = prompt('Enter staff token:');
+        if (!STAFF_TOKEN) {
+            alert('Staff token required');
+            location.reload();
+        }
+        
+        async function apiCall(url, options = {}) {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Staff-Token': STAFF_TOKEN,
+                    ...options.headers
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.statusText}`);
+            }
+            
+            return response.json();
+        }
+        
+        async function loadBots() {
+            try {
+                const data = await apiCall('/v1/admin/bots');
+                const botList = document.getElementById('bot-list');
+                const loading = document.getElementById('loading');
+                
+                botList.innerHTML = '';
+                data.bots.forEach(bot => {
+                    const li = document.createElement('li');
+                    li.className = 'bot-item';
+                    li.innerHTML = `
+                        <div><strong>${bot.name || bot.id}</strong></div>
+                        <div style="font-size: 12px; color: #666;">${bot.id}</div>
+                    `;
+                    li.onclick = () => selectBot(bot);
+                    botList.appendChild(li);
+                });
+                
+                loading.style.display = 'none';
+                botList.style.display = 'block';
+            } catch (error) {
+                showMessage('Error loading bots: ' + error.message, 'error');
+            }
+        }
+        
+        async function selectBot(bot) {
+            currentBot = bot;
+            
+            document.querySelectorAll('.bot-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.bot-item').classList.add('active');
+            
+            document.getElementById('no-selection').style.display = 'none';
+            document.getElementById('theme-editor').style.display = 'block';
+            
+            await loadBotTheme(bot.id);
+            await loadThemeHistory(bot.id);
+            updatePreview();
+        }
+        
+        async function loadBotTheme(botId) {
+            try {
+                const data = await apiCall(`/v1/admin/bots/${botId}/theme`);
+                currentTheme = data;
+                
+                document.getElementById('theme-version').value = data.themeVersion || '1.0.0';
+                document.getElementById('layout-mode').value = data.layoutMode || 'bubble';
+                
+                if (data.theme) {
+                    document.getElementById('accent-color').value = data.theme.brand?.accent || '#3B82F6';
+                    document.getElementById('accent-color-text').value = data.theme.brand?.accent || '#3B82F6';
+                    document.getElementById('logo-url').value = data.theme.brand?.logoUrl || '';
+                    document.getElementById('avatar-url').value = data.theme.brand?.avatarUrl || '';
+                    document.getElementById('font-family').value = data.theme.typography?.fontFamily || '';
+                    document.getElementById('font-size').value = data.theme.typography?.baseSize || 14;
+                    
+                    document.getElementById('light-bg').value = data.theme.colors?.light?.bg || '#FFFFFF';
+                    document.getElementById('light-bg-text').value = data.theme.colors?.light?.bg || '#FFFFFF';
+                    document.getElementById('light-text').value = data.theme.colors?.light?.text || '#000000';
+                    document.getElementById('light-text-text').value = data.theme.colors?.light?.text || '#000000';
+                    
+                    document.getElementById('dark-bg').value = data.theme.colors?.dark?.bg || '#000000';
+                    document.getElementById('dark-bg-text').value = data.theme.colors?.dark?.bg || '#000000';
+                    document.getElementById('dark-text').value = data.theme.colors?.dark?.text || '#FFFFFF';
+                    document.getElementById('dark-text-text').value = data.theme.colors?.dark?.text || '#FFFFFF';
+                }
+                
+                document.getElementById('theme-json').value = JSON.stringify(data.theme, null, 2);
+                
+            } catch (error) {
+                showMessage('Error loading theme: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadThemeHistory(botId) {
+            try {
+                const data = await apiCall(`/v1/admin/bots/${botId}/theme/history`);
+                const historyDiv = document.getElementById('theme-history');
+                
+                historyDiv.innerHTML = '';
+                data.history.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `
+                        <div>
+                            <strong>v${item.theme_version}</strong>
+                            <div style="font-size: 12px; color: #666;">
+                                ${new Date(item.created_at).toLocaleString()} by ${item.created_by}
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="rollbackToVersion('${item.theme_version}')">
+                            Rollback
+                        </button>
+                    `;
+                    historyDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading theme history:', error);
+            }
+        }
+        
+        function updatePreview() {
+            const previewFrame = document.getElementById('preview-frame');
+            previewFrame.src = `/demo/dual-mode-test.html?bot_id=${currentBot.id}&preview=1`;
+        }
+        
+        async function saveTheme() {
+            if (!currentBot) return;
+            
+            try {
+                const themeData = {
+                    theme: JSON.parse(document.getElementById('theme-json').value),
+                    layoutMode: document.getElementById('layout-mode').value
+                };
+                
+                await apiCall(`/v1/admin/bots/${currentBot.id}/theme`, {
+                    method: 'PUT',
+                    body: JSON.stringify(themeData)
+                });
+                
+                showMessage('Theme saved successfully!', 'success');
+                await loadBotTheme(currentBot.id);
+                await loadThemeHistory(currentBot.id);
+                updatePreview();
+            } catch (error) {
+                showMessage('Error saving theme: ' + error.message, 'error');
+            }
+        }
+        
+        function exportTheme() {
+            if (!currentTheme) return;
+            
+            const dataStr = JSON.stringify(currentTheme, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `theme-${currentBot.id}-${Date.now()}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        function importTheme() {
+            document.getElementById('import-file').click();
+        }
+        
+        document.getElementById('import-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const themeData = JSON.parse(e.target.result);
+                    document.getElementById('theme-json').value = JSON.stringify(themeData.theme, null, 2);
+                    showMessage('Theme imported successfully!', 'success');
+                } catch (error) {
+                    showMessage('Error importing theme: Invalid JSON', 'error');
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        async function rollbackToVersion(version) {
+            if (!currentBot) return;
+            
+            if (!confirm(`Rollback to version ${version}?`)) return;
+            
+            try {
+                await apiCall(`/v1/admin/bots/${currentBot.id}/theme/rollback`, {
+                    method: 'POST',
+                    body: JSON.stringify({ version })
+                });
+                
+                showMessage('Theme rolled back successfully!', 'success');
+                await loadBotTheme(currentBot.id);
+                await loadThemeHistory(currentBot.id);
+                updatePreview();
+            } catch (error) {
+                showMessage('Error rolling back theme: ' + error.message, 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            messagesDiv.appendChild(div);
+            
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+        }
+        
+        document.getElementById('accent-color').addEventListener('change', function() {
+            document.getElementById('accent-color-text').value = this.value;
+        });
+        
+        document.getElementById('accent-color-text').addEventListener('change', function() {
+            document.getElementById('accent-color').value = this.value;
+        });
+        
+        loadBots();
+    </script>
+</body>
+</html>

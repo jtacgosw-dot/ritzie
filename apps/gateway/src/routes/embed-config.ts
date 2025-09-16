@@ -118,7 +118,7 @@ function loadThemePreset(themeId: string): ThemeConfig | null {
   return null;
 }
 
-router.get('/config', requireSite, async (req: any, res) => {
+router.get('/', requireSite, async (req: any, res) => {
   try {
     const { site_id, bot_id } = req.site;
     
@@ -160,6 +160,11 @@ router.get('/config', requireSite, async (req: any, res) => {
       themeId: themeId,
       themeVersion: bot.theme_version || '1.0.0',
       layoutMode: bot.layout_mode || 'bubble',
+      runtimeFlags: {
+        reducedMotionDefault: effectiveTheme.motion.reducedMotion,
+        personalityTone: effectiveTheme.personality.tone,
+        emojiEnabled: effectiveTheme.personality.emoji
+      },
       assetsBase: process.env.ASSETS_CDN_BASE || 'https://cdn.ritzie.ai',
       telemetryBase: process.env.TELEMETRY_BASE || 'https://events.ritzie.ai'
     };

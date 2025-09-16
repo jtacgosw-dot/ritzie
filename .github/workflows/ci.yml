@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ritzie_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+    
+    - name: Setup database
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -d ritzie_test -f infra/db/schema.sql
+        PGPASSWORD=postgres psql -h localhost -U postgres -d ritzie_test -f scripts/setup-demo-data.sql
+      env:
+        PGPASSWORD: postgres
+    
+    - name: Type check
+      run: pnpm run typecheck
+    
+    - name: Lint
+      run: pnpm run lint
+    
+    - name: Build packages
+      run: pnpm run build
+    
+    - name: Run tests
+      run: pnpm run test
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/ritzie_test
+        REDIS_URL: redis://localhost:6379
+        JWT_SECRET: test_secret
+        OPENAI_API_KEY: sk-test
+    
+    - name: Bundle size check
+      run: |
+        pnpm run build:embed
+        BUNDLE_SIZE=$(stat -c%s packages/embed/dist/chat.v1.js)
+        echo "Bundle size: $BUNDLE_SIZE bytes"
+        if [ $BUNDLE_SIZE -gt 102400 ]; then
+          echo "❌ Bundle size exceeds 100KB limit"
+          exit 1
+        fi
+        echo "✅ Bundle size within limits"
+    
+    - name: Stealth verification
+      run: |
+        echo "Checking for vendor strings in compiled assets..."
+        if find packages/embed/dist -name "*.js" -exec grep -l "Ritzie" {} \; | grep -q .; then
+          echo "❌ Found 'Ritzie' strings in compiled bundles"
+          exit 1
+        fi
+        if find apps/gateway/public/themes -name "*.css" -exec grep -l "Ritzie" {} \; | grep -q .; then
+          echo "❌ Found 'Ritzie' strings in compiled CSS"
+          exit 1
+        fi
+        echo "✅ No vendor strings found in compiled assets"
+    
+    - name: Theme compilation test
+      run: |
+        echo "Testing theme compilation..."
+        node scripts/build-theme.js SITE_demo_site1 palantr
+        node scripts/build-theme.js SITE_demo_site1 pastel-playful
+        node scripts/build-theme.js SITE_demo_site1 high-contrast
+        echo "✅ All themes compiled successfully"

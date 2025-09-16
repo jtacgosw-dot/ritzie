@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Corp Chat - Site 2</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .demo-header {
+            margin-bottom: 40px;
+        }
+        .demo-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        .demo-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.success { background: #10b981; }
+        .status.warning { background: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🌿 Green Corp Support</h1>
+            <p>Welcome to Green Corp - Your Sustainable Technology Partner</p>
+        </div>
+        
+        <div class="demo-content">
+            <h2>Demo Site 2 - Green Theme</h2>
+            <p>This demonstrates the same white-label widget with a completely different theme, showing multi-tenant theming capabilities.</p>
+            
+            <div class="demo-info">
+                <h3>🎨 Theme Configuration:</h3>
+                <ul>
+                    <li>Primary Color: #28a745 (Green)</li>
+                    <li>Secondary Color: #17a2b8 (Teal)</li>
+                    <li>Font Family: Roboto, sans-serif</li>
+                    <li>Border Radius: 12px</li>
+                    <li>Site Token: SITE_demo_site2</li>
+                </ul>
+                
+                <h3>🔒 Multi-Tenant Isolation:</h3>
+                <ul>
+                    <li>Separate CSS bundle with different hash</li>
+                    <li>Isolated analytics and conversation data</li>
+                    <li>Different bot configuration and prompts</li>
+                    <li>Scoped cache keys prevent cross-tenant leakage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget Configuration -->
+    <script>
+        window.CHAT_CONFIG = {
+            siteToken: "SITE_demo_site2",
+            botId: "550e8400-e29b-41d4-a716-446655440004",
+            assetsBase: "http://localhost:8080",
+            telemetryBase: "http://localhost:8080"
+        };
+    </script>
+    
+    <!-- Load the stealth chat widget -->
+    <script src="../packages/embed/dist/chat.v1.js" async></script>
+</body>
+</html>

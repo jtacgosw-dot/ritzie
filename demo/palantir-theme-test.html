@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palantir Theme Test - Ritzie Chat</title>
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .test-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #3B82F6;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        button {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #f3f4f6;
+            border-color: #3B82F6;
+        }
+        button.active {
+            background: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+        .status {
+            font-weight: 600;
+            color: #059669;
+        }
+        .page-mode-container {
+            height: 500px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .accessibility-info {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .accessibility-info h4 {
+            margin-top: 0;
+            color: #0369a1;
+        }
+        .accessibility-info ul {
+            margin-bottom: 0;
+        }
+        .theme-preview {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Palantir Theme Test</h1>
+            <p>Testing the new Palantir-style theme with dual mode support, accessibility features, and dark/light mode switching.</p>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-section">
+                <h3>🫧 Bubble Mode Test</h3>
+                <div class="controls">
+                    <button onclick="switchToBubble()" class="active" id="bubble-btn">Bubble Mode</button>
+                    <button onclick="openChat()">Open Chat</button>
+                    <button onclick="closeChat()">Close Chat</button>
+                </div>
+                <p>Status: <span class="status" id="bubble-status">Active</span></p>
+                <p>The bubble widget should appear in the bottom-right corner with the new Palantir styling.</p>
+            </div>
+
+            <div class="test-section">
+                <h3>📄 Page Mode Test</h3>
+                <div class="controls">
+                    <button onclick="switchToPage()" id="page-btn">Page Mode</button>
+                </div>
+                <p>Status: <span class="status" id="page-status">Inactive</span></p>
+                <div class="page-mode-container" id="page-container">
+                    <p style="padding: 20px; text-align: center; color: #6b7280;">Switch to page mode to see the chat interface here</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌓 Theme Mode Controls</h3>
+            <div class="controls">
+                <button onclick="setLightTheme()" id="light-btn">Light Theme</button>
+                <button onclick="setDarkTheme()" id="dark-btn">Dark Theme</button>
+                <button onclick="setAutoTheme()" class="active" id="auto-btn">Auto Theme</button>
+            </div>
+            <p>Current Theme: <span class="status" id="theme-status">Auto (follows system preference)</span></p>
+            
+            <div class="theme-preview">
+                <div class="color-swatch" style="background: #3B82F6; color: white;">Accent</div>
+                <div class="color-swatch" style="background: #FFFFFF; color: #0B1220;">Light</div>
+                <div class="color-swatch" style="background: #0B0F14; color: #E6EAF0;">Dark</div>
+                <div class="color-swatch" style="background: #F3F4F6; color: #374151;">Chip</div>
+            </div>
+        </div>
+
+        <div class="accessibility-info">
+            <h4>♿ Accessibility Features</h4>
+            <ul>
+                <li><strong>Keyboard Navigation:</strong> Press Alt+/ to skip to message input</li>
+                <li><strong>Screen Reader:</strong> Proper ARIA labels and live regions for streaming messages</li>
+                <li><strong>Color Contrast:</strong> AA compliant (4.5:1 for body text, 3:1 for large text)</li>
+                <li><strong>Focus Management:</strong> Logical tab order and visible focus indicators</li>
+                <li><strong>Reduced Motion:</strong> Respects prefers-reduced-motion preference</li>
+                <li><strong>High Contrast:</strong> Supports forced-colors mode</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        window.RITZIE = {
+            siteToken: "SITE_demo_site1",
+            botId: "BOT_demo_bot1",
+            theme: "palantr",
+            mode: "bubble",
+            assetsBase: "http://localhost:8080"
+        };
+
+        function switchToBubble() {
+            window.RITZIE?.api?.setMode('bubble');
+            updateModeStatus('bubble');
+        }
+
+        function switchToPage() {
+            window.RITZIE?.api?.setMode('page');
+            window.RITZIE.mount = '#page-container';
+            updateModeStatus('page');
+        }
+
+        function openChat() {
+            window.RITZIE?.api?.open();
+        }
+
+        function closeChat() {
+            window.RITZIE?.api?.close();
+        }
+
+        function setLightTheme() {
+            window.RITZIE?.api?.setThemeMode('light');
+            updateThemeStatus('light');
+        }
+
+        function setDarkTheme() {
+            window.RITZIE?.api?.setThemeMode('dark');
+            updateThemeStatus('dark');
+        }
+
+        function setAutoTheme() {
+            window.RITZIE?.api?.setThemeMode('auto');
+            updateThemeStatus('auto');
+        }
+
+        function updateModeStatus(mode) {
+            document.getElementById('bubble-status').textContent = mode === 'bubble' ? 'Active' : 'Inactive';
+            document.getElementById('page-status').textContent = mode === 'page' ? 'Active' : 'Inactive';
+            
+            document.getElementById('bubble-btn').classList.toggle('active', mode === 'bubble');
+            document.getElementById('page-btn').classList.toggle('active', mode === 'page');
+        }
+
+        function updateThemeStatus(theme) {
+            const statusText = {
+                'light': 'Light Mode',
+                'dark': 'Dark Mode', 
+                'auto': 'Auto (follows system preference)'
+            };
+            document.getElementById('theme-status').textContent = statusText[theme];
+            
+            document.getElementById('light-btn').classList.toggle('active', theme === 'light');
+            document.getElementById('dark-btn').classList.toggle('active', theme === 'dark');
+            document.getElementById('auto-btn').classList.toggle('active', theme === 'auto');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key === '/') {
+                e.preventDefault();
+                console.log('Alt+/ pressed - should focus message input');
+            }
+        });
+    </script>
+
+    <script src="http://localhost:8080/embeds/chat.v1.js" async></script>
+</body>
+</html>
