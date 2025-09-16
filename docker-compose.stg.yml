@@ -20,13 +20,15 @@ services:
       - redisdata:/data
 
   gateway:
-    build: ./apps/gateway
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
     env_file: 
       - .env
     environment:
       DATABASE_URL: postgres://ritzie:ritzie@postgres:5432/ritzie
       REDIS_URL: redis://redis:6379
-      NODE_ENV: production
+      NODE_ENV: staging
     depends_on: 
       - postgres
       - redis
