@@ -1,10 +1,10 @@
 services:
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: ritzie
       POSTGRES_USER: ritzie
-      POSTGRES_PASSWORD: ritzie_prod_password_change_me
+      POSTGRES_PASSWORD: ritzie
     volumes: 
       - pgdata:/var/lib/postgresql/data
     healthcheck: 
@@ -12,36 +12,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    restart: unless-stopped
 
   redis:
     image: redis:7
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "secure_redis_2024"]
     volumes: 
       - redisdata:/data
-    restart: unless-stopped
 
   gateway:
-    build: ./apps/gateway
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
     env_file: 
-      - .env.prod
+      - .env
     environment:
-      DATABASE_URL: postgres://ritzie:ritzie_prod_password_change_me@postgres:5432/ritzie
-      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://ritzie:ritzie@postgres:5432/ritzie?sslmode=disable
+      REDIS_URL: redis://:secure_redis_2024@redis:6379
       NODE_ENV: production
     depends_on: 
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
+      - postgres
+      - redis
     ports: 
-      - "8080:8080"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - "8082:8080"
 
 volumes:
   pgdata:
