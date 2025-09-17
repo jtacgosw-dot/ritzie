@@ -18,7 +18,16 @@ router.post('/uploads', upload.single('file'), async (req: Request, res: Respons
       return res.status(400).json({ error: 'Missing site_token or file' });
     }
 
-    const { org_id, site_id } = extractSiteFromToken(site_token);
+    const siteResult = await query(
+      'SELECT s.id as site_id, s.org_id FROM sites s WHERE s.site_token = $1',
+      [site_token]
+    );
+    
+    if (siteResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid site token' });
+    }
+    
+    const { site_id, org_id } = siteResult.rows[0];
     
     const docResult = await query(
       `INSERT INTO documents (org_id, site_id, source, title, meta) 
@@ -59,7 +68,16 @@ router.post('/urls', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing site_token or url' });
     }
 
-    const { org_id, site_id } = extractSiteFromToken(site_token);
+    const siteResult = await query(
+      'SELECT s.id as site_id, s.org_id FROM sites s WHERE s.site_token = $1',
+      [site_token]
+    );
+    
+    if (siteResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid site token' });
+    }
+    
+    const { site_id, org_id } = siteResult.rows[0];
     
     const docResult = await query(
       `INSERT INTO documents (org_id, site_id, source, title, meta) 
@@ -101,7 +119,16 @@ router.get('/search', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing site_token or query' });
     }
 
-    const { org_id, site_id } = extractSiteFromToken(site_token as string);
+    const siteResult = await query(
+      'SELECT s.id as site_id, s.org_id FROM sites s WHERE s.site_token = $1',
+      [site_token]
+    );
+    
+    if (siteResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid site token' });
+    }
+    
+    const { site_id, org_id } = siteResult.rows[0];
     
     const results = await searchKnowledge(
       q as string,

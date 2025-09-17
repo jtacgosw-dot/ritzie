@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { query } from '../utils/db.js';
 import { requireSite } from '../auth.js';
 import { ThemeConfig } from '@ritzie/types';
+import { getVisitorVariant, ABTestConfig } from '../utils/ab-testing.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -127,15 +128,30 @@ router.get('/', requireSite, async (req: any, res) => {
     const { site_id, bot_id } = req.site;
     
     const botResult = await query(
-      'SELECT theme, theme_overrides, layout_mode, theme_version FROM bots WHERE id = $1 AND site_id = $2',
+      'SELECT theme, theme_overrides, layout_mode, theme_version, ab_test_enabled, ab_variant_a, ab_variant_b FROM bots WHERE id = $1 AND site_id = $2',
       [bot_id, site_id]
     );
     
     if (botResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Bot not found' });
+      return res.status(401).json({ error: 'Bot not found' });
     }
     
     const bot = botResult.rows[0];
+    const visitorId = req.query.visitor_id as string || 'anonymous';
+    
+    let finalLayoutMode = 'bubble';
+    if (bot.layout_mode === 'disabled') {
+      finalLayoutMode = 'disabled';
+    } else if (bot.layout_mode && ['bubble', 'page'].includes(bot.layout_mode)) {
+      finalLayoutMode = bot.layout_mode;
+    } else {
+      const abTestConfig = {
+        enabled: bot.ab_test_enabled || false,
+        variantA: bot.ab_variant_a || 'bubble',
+        variantB: bot.ab_variant_b || 'page'
+      };
+      finalLayoutMode = getVisitorVariant(visitorId, abTestConfig);
+    }
 
     let effectiveTheme = BASE_THEME;
     
@@ -171,7 +187,7 @@ router.get('/', requireSite, async (req: any, res) => {
       theme: effectiveTheme,
       themeId: themeId,
       themeVersion: bot.theme_version || '1.0.0',
-      layoutMode: bot.layout_mode || 'bubble',
+      layoutMode: finalLayoutMode,
       runtimeFlags: {
         reducedMotionDefault: effectiveTheme.motion.reducedMotion,
         personalityTone: effectiveTheme.personality.tone,
