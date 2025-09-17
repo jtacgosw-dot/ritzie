@@ -12,6 +12,7 @@ import { sseChat } from "./sse.js";
 import { attachWS } from "./ws.js";
 import analyticsRoutes from "./routes/analytics.js";
 import embedConfigRoutes from "./routes/embed-config.js";
+import knowledgeRoutes from "./routes/knowledge.js";
 
 const app: express.Application = express();
 app.use(cors());
@@ -33,6 +34,7 @@ app.use("/themes", express.static(path.resolve(process.cwd(), "public/themes")))
 
 app.use("/v1/analytics", analyticsRoutes);
 app.use("/v1/embed-config", embedConfigRoutes);
+app.use("/v1/knowledge", knowledgeRoutes);
 
 import adminRoutes from "./routes/admin.js";
 app.use("/v1/admin", adminRoutes);

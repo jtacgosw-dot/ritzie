@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../utils/db.js';
 import { requireSite } from '../auth.js';
+import { sendSlackAlert } from '../utils/alerts.js';
 
 const router: any = Router();
 
@@ -21,14 +22,26 @@ router.post('/events', requireSite, async (req: any, res: Response) => {
       
       await query(
         'INSERT INTO events (org_id, site_id, bot_id, visitor_id, type, payload, ts) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-        [org_id, site_id, bot_id, visitor_id, event.type, JSON.stringify(event.payload || {}), new Date()]
+        [org_id, site_id, bot_id, visitor_id, event.type, JSON.stringify({
+          ...event.payload || {},
+          utm_source: event.utm_source,
+          utm_medium: event.utm_medium,
+          utm_campaign: event.utm_campaign,
+          theme_version: event.theme_version,
+          layout_mode: event.layout_mode
+        }), new Date()]
       );
+
+      if (event.type === 'conversion') {
+        console.log(`[CONVERSION] Org: ${org_id}, Site: ${site_id}, Bot: ${bot_id}, UTM: ${event.utm_source}/${event.utm_medium}/${event.utm_campaign}`);
+      }
     }
 
     res.json({ ok: true, ingested: events.length });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analytics ingestion error:', error);
+    await sendSlackAlert(`Analytics ingestion failed: ${error.message}`, 'error');
     res.status(500).json({ error: 'Failed to ingest analytics events' });
   }
 });

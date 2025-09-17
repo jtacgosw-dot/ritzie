@@ -26,6 +26,9 @@ CREATE TABLE bots (
   theme_overrides jsonb,
   layout_mode text DEFAULT 'bubble' CHECK (layout_mode IN ('bubble', 'page', 'disabled')),
   theme_version text DEFAULT '1.0.0',
+  ab_test_enabled boolean DEFAULT false,
+  ab_variant_a text DEFAULT 'bubble',
+  ab_variant_b text DEFAULT 'page',
   created_at timestamptz DEFAULT now()
 );
 
