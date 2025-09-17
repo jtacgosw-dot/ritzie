@@ -30,7 +30,7 @@ const embedPath = path.resolve(process.cwd(), "../../packages/embed/dist");
 console.log("Embed static path:", embedPath);
 console.log("File exists:", fs.existsSync(path.join(embedPath, "chat.v1.js")));
 app.use("/embeds", express.static(embedPath));
-app.use("/themes", express.static(path.resolve(process.cwd(), "public/themes")));
+app.use("/themes", express.static(path.resolve(__dirname, "../public/themes")));
 
 app.use("/v1/analytics", analyticsRoutes);
 app.use("/v1/embed-config", embedConfigRoutes);
