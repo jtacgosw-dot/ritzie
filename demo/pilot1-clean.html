@@ -458,42 +458,68 @@
         }
 
         function loadChatbot(mode) {
-            // Remove existing chatbot scripts
+            // Prevent multiple initializations
+            if (window.CHATBOT_LOADING) {
+                console.log('Chatbot already loading, skipping...');
+                return;
+            }
+            window.CHATBOT_LOADING = true;
+            
+            // Clean up existing widgets properly
+            document.querySelectorAll('chat-widget').forEach(widget => {
+                console.log('Removing existing chat-widget element');
+                widget.remove();
+            });
             document.querySelectorAll('script[src*="chat.v1.js"]').forEach(script => {
+                console.log('Removing existing chat script');
                 script.remove();
             });
             
-            // Clear existing chatbot
+            // Clear existing chatbot instance
             if (window.CHATBOT_INSTANCE) {
+                console.log('Destroying existing chatbot instance');
                 window.CHATBOT_INSTANCE.destroy?.();
+                window.CHATBOT_INSTANCE = null;
             }
             
-            // Configure new chatbot
-            window.CHATBOT = {
-                siteToken: "SITE_pilot1",
-                botId: "550e8400-e29b-41d4-a716-446655440501",
-                mode: mode,
-                assetsBase: "http://localhost:8082",
-                apiBase: "http://localhost:8082"
-            };
+            // Clear the window.CHATBOT to force re-initialization
+            delete window.CHATBOT;
             
-            if (mode === 'page') {
-                window.CHATBOT.mount = "#ritzie-chat";
-            }
-            
-            // Load chatbot script
-            const script = document.createElement('script');
-            script.src = 'http://localhost:8082/embeds/chat.v1.js';
-            script.async = true;
-            script.onload = () => {
-                updateStatus('Assistant ready', 'connected');
-                chatbotLoaded = true;
-            };
-            script.onerror = () => {
-                updateStatus('Failed to load assistant', 'error');
-            };
-            
-            document.head.appendChild(script);
+            // Wait a moment for cleanup
+            setTimeout(() => {
+                // Configure new chatbot
+                window.CHATBOT = {
+                    siteToken: "SITE_pilot1",
+                    botId: "550e8400-e29b-41d4-a716-446655440501",
+                    mode: mode,
+                    assetsBase: "https://user:17834f940bf1bc386b9e9f3ec86f6422@white-label-chat-app-tunnel-0py6fk93.devinapps.com",
+                    apiBase: "https://user:17834f940bf1bc386b9e9f3ec86f6422@white-label-chat-app-tunnel-0py6fk93.devinapps.com"
+                };
+                
+                if (mode === 'page') {
+                    window.CHATBOT.mount = "#ritzie-chat";
+                }
+                
+                console.log('Loading chatbot with config:', window.CHATBOT);
+                
+                // Load chatbot script with proper error handling
+                const script = document.createElement('script');
+                script.src = 'https://user:17834f940bf1bc386b9e9f3ec86f6422@white-label-chat-app-tunnel-0py6fk93.devinapps.com/embeds/chat.v1.js';
+                script.async = true;
+                script.onload = () => {
+                    console.log('Chatbot script loaded successfully');
+                    updateStatus('Assistant ready', 'connected');
+                    chatbotLoaded = true;
+                    window.CHATBOT_LOADING = false;
+                };
+                script.onerror = () => {
+                    console.error('Failed to load chatbot script');
+                    updateStatus('Failed to load assistant', 'error');
+                    window.CHATBOT_LOADING = false;
+                };
+                
+                document.head.appendChild(script);
+            }, 100);
         }
 
         // Initialize
@@ -501,7 +527,7 @@
         loadChatbot('bubble');
         
         // Test connectivity
-        fetch('http://localhost:8082/health')
+        fetch('https://user:17834f940bf1bc386b9e9f3ec86f6422@white-label-chat-app-tunnel-0py6fk93.devinapps.com/health')
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
